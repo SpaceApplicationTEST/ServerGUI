@@ -35,9 +35,6 @@ def insert_info():
             conn_db.close()
         else:
             print("tormozim")
-            return True
-
-
     except Exception as e:
         print(f"Error: {e}")
 
@@ -77,18 +74,16 @@ try:
     while True:
         conn, addr = server.accept()
         print(f"Подключение от {addr}")
-        if insert_info():
-            try:
-                data = conn.recv(1024).decode()
-                if data:
-                    print(f"Получен запрос: {data}")
-                    commands(conn, data)
-            except Exception as e:
-                print(f"Error: {e}")
-            finally:
-                conn.close()
-        else:
-            break
+
+        try:
+            data = conn.recv(1024).decode()
+            if data:
+                print(f"Получен запрос: {data}")
+                commands(conn, data)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            conn.close()
 except KeyboardInterrupt:
     print("\nServer stopped")
 finally:
