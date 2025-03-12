@@ -11,18 +11,21 @@ dsn = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={datab
 
 def insert_info():
     try:
+        name = input("Enter name: ")
+        diameter = float(input("Enter diameter: "))
+        howfar = float(input("Enter the distance from Earth: "))
+        type = input("Enter type: ")
+
         conn_db = pyodbc.connect(dsn)
         cursor = conn_db.cursor()
 
         insert_data = """
-            INSERT INTO [Planets] ([name], [diameter], [howfar], [Type]) VALUES
-            ('Earth', 12742, 149.6, 'Planet'),
-            ('Mars', 6779, 227.9, 'Planet'),
-            ('Jupiter', 139820, 778, 'Gas Giant'),
-            ('Saturn', 116460, 1430, 'Gas Giant'),
-            ('Neptune', 49528, 4500, 'Ice Giant')
+            INSERT INTO [Planets] ([name], [diameter], [howfar], [Type]) 
+            VALUES (?, ?, ?, ?)
         """
-        cursor.execute(insert_data)
+
+        values = (name, diameter, howfar, type)
+        cursor.execute(insert_data, values)
         conn_db.commit()
 
         print("Data inserted")
