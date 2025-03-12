@@ -51,3 +51,31 @@ def commands(conn, request):
     except Exception as e:
         print(f"Error: {e}")
         conn.send(f"Error: {e}".encode())
+
+
+IP = '127.0.0.1'
+PORT = 4000
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((IP, PORT))
+server.listen(2)
+print(f"Подключен на {IP}:{PORT}")
+
+try:
+    while True:
+        conn, addr = server.accept()
+        print(f"Подключение от {addr}")
+
+        try:
+            data = conn.recv(1024).decode()
+            if data:
+                print(f"Получен запрос: {data}")
+                commands(conn, data)
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            conn.close()
+except KeyboardInterrupt:
+    print("\nServer stopped")
+finally:
+    server.close()
