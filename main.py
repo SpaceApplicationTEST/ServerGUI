@@ -9,31 +9,32 @@ password = ''
 
 dsn = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};Trusted_Connection=yes'
 
+def insert_info():
+    try:
+        conn_db = pyodbc.connect(dsn)
+        cursor = conn_db.cursor()
+
+        insert_data = """
+            INSERT INTO [Planets] ([name], [diameter], [howfar], [Type]) VALUES
+            ('Earth', 12742, 149.6, 'Planet'),
+            ('Mars', 6779, 227.9, 'Planet'),
+            ('Jupiter', 139820, 778, 'Gas Giant'),
+            ('Saturn', 116460, 1430, 'Gas Giant'),
+            ('Neptune', 49528, 4500, 'Ice Giant')
+        """
+        cursor.execute(insert_data)
+        conn_db.commit()
+
+        print("Data inserted")
+        cursor.close()
+        conn_db.close()
+
+    except Exception as e:
+        print(f"Error: {e}")
+
 def commands(conn, request):
     try:
-        if request.startswith('insert:'):
-            data = request[len('insert:'):]
-            name, diameter, howfar, type = data.split(',')
-
-            name = name.strip()
-            diameter = float(diameter.strip())
-            howfar = float(howfar.strip())
-            type_ = type.strip()
-
-            conn_db = pyodbc.connect(dsn)
-            cursor = conn_db.cursor()
-
-            insert_data = "INSERT INTO [Planets] ([name], [diameter], [howfar], [Type]) VALUES (?, ?, ?, ?)"
-            values = (name, diameter, howfar, type_)
-            cursor.execute(insert_data, values)
-            conn_db.commit()
-
-            result_str = "Data inserted"
-            conn.send(result_str.encode())
-            cursor.close()
-            conn_db.close()
-
-        elif request == 'vivod':
+        if request == 'vivod':
           with pyodbc.connect(dsn) as conn_db:
             cursor = conn_db.cursor()
             cursor.execute("SELECT * FROM [Planets]")
@@ -60,6 +61,8 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((IP, PORT))
 server.listen(2)
 print(f"Подключен на {IP}:{PORT}")
+
+insert_info()
 
 try:
     while True:
