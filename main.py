@@ -32,3 +32,22 @@ def commands(conn, request):
             conn.send(result_str.encode())
             cursor.close()
             conn_db.close()
+
+        elif request == 'vivod':
+          with pyodbc.connect(dsn) as conn_db:
+            cursor = conn_db.cursor()
+            cursor.execute("SELECT * FROM [Planets]")
+            rows = cursor.fetchall()
+
+            result_str = ""
+            for row in rows:
+              result_str += f"\nID:{row[0]} Name: {row[1]}, Diameter: {row[2]}, How far from Earth: {row[3]}, Type: {row[4]}"
+
+            conn.send(result_str.encode())
+
+        else:
+            conn.send("Error".encode())
+
+    except Exception as e:
+        print(f"Error: {e}")
+        conn.send(f"Error: {e}".encode())
